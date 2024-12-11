@@ -34,12 +34,18 @@
       mode: 0660
     register: copy_results
 
+  - name: Copy public ssh key
+    copy:
+      dest: "/tmp/"
+      src: "{{ ssh_dir }}/{{ ssh_pub_key }}"
+      force: yes
+
   - name: Configure the image
     command: |
       virt-customize -a {{ libvirt_pool_dir }}/{{ vm_name }}.qcow2 \
       --hostname {{ vm_name }} \
       --root-password password:{{ vm_root_pass }} \
-      --ssh-inject 'root:file:{{ ssh_key }}' \
+      --ssh-inject 'root:file:/tmp/{{ ssh_pub_key }}' \
       --uninstall cloud-init --selinux-relabel
     when: copy_results is changed
 
@@ -48,11 +54,16 @@
       command: define
       xml: "{{ lookup('template', 'vm-template.xml.j2') }}"
 
-  - name: Ensure temporary file is deleted
+  - name: Remove base image file
     file:
       path: "/tmp/{{ base_image_name }}"
       state: absent
-    when: cleanup_tmp | bool
+    when: cleanup_image | bool
+
+  - name: Remove temporary public ssh key
+    file:
+      path: "/tmp/{{ ssh_pub_key }}"
+      state: absent
 
 - name: Ensure VM is started
   community.libvirt.virt:

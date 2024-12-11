@@ -1,7 +1,8 @@
 #SPDX-License-Identifier: MIT-0
 galaxy_info:
   role_name: kvm
-  author: gorygre
+  namespace: gorygre
+  author: Gregory McCall
   description: KVM Provisioning
 
   license: MIT
