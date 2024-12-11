@@ -1,0 +1,26 @@
+#SPDX-License-Identifier: MIT-0
+namespace: gorygre
+
+name: kvm
+
+version: 1.0.0
+
+readme: README.md
+
+authors:
+- Gregory McCall <gregory@grmccall.com>
+
+description: Create and destroy VMs
+
+license:
+- MIT-0
+
+tags: []
+
+dependencies: {community.libvirt.virt}
+
+repository: https://github.com/gorygre/ansible-collection-kvm
+
+issues: https://github.com/gorygre/ansible-collection-kvm/issues
+
+build_ignore: []
