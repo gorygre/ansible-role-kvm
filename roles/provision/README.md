@@ -5,17 +5,20 @@ A role to provision a virtual machine based on a generic cloud image.
 ## Role Variables
 
 ```
-base_image_name  The basename of the qcow2 cloud image.
-base_image_url   Where to download the image from.
-base_image_sha   SHA256 hash of the image for validation.
-libvirt_pool_dir Directory to store VM image in.
-vm_name          Name of the new VM.
-vm_vcpus         Number of virtual CPUs.
-vm_ram_mb        RAM to allocate for the VM in MB.
-vm_net           Network setting of the VM.
-vm_root_pass     Root user's password.
-cleanup_tmp      Bool to remove the (unmodified) downloaded image.
-ssh_key          Path to public SSH key to configure the VM with.
+ssh_public_key:   Filename of the admin public key to inject
+ssH_dir:          Yypically ~/.ssh
+
+image_name:       Filename of the base disk.
+image_url:        Where to download the disk from.
+image_sha256:     Hash of the disk for validation.
+image_cleanup:    yes/no remove the image (can be reused).
+
+vm_name:          Name of the VM.
+vm_vcpus:         Number of virtual CPUs.
+vm_ram_mb:        RAM to allocate for the VM in MB.
+vm_net:           Network setting.
+vm_root_password: Root user's password.
+vm_disk_dir:      Directory to store the configured disk in.
 ```
 
 If a non-default image is specified you may want to write/get your own template because `templates/vm-template.xml.j2` is based on a Centos Stream 9 VM.
@@ -32,12 +35,8 @@ Provision default image.
 - hosts: vm_servers
   become: yes
   tasks:
-    - name: KVM Provision role
-      include_role:
-        name: gorygre.kvm
+    - role: gorygre.kvm.provision
       vars:
-        vm_name: vm01
-        vm_vcpus: 2
-        vm_ram_mb: 2048
-        cleanup_tmp: yes
+        vm_name: CentOS9-lab01
+        ssh_public_key: id_ed25519.pub
 ```

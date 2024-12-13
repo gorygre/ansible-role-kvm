@@ -17,8 +17,6 @@ license:
 
 tags: []
 
-dependencies: {community.libvirt.virt}
-
 repository: https://github.com/gorygre/ansible-collection-kvm
 
 issues: https://github.com/gorygre/ansible-collection-kvm/issues

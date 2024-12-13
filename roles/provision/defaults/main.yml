@@ -1,15 +1,16 @@
 #SPDX-License-Identifier: MIT-0
 ---
-# defaults file for kvm_provision
-base_image_name: CentOS-Stream-GenericCloud-x86_64-9-20241209.0.x86_64.qcow2
-base_image_url: https://cloud.centos.org/centos/9-stream/x86_64/images/{{ base_image_name }}
-base_image_sha: 4f02929cfe96b7759c5f6387789968a1a9b5f70f9215085e89111a520662d468
-libvirt_pool_dir: /var/lib/libvirt/images
+ssh_public_key: id_rsa.pub
+ssh_dir: ~/.ssh
+
+image_name: CentOS-Stream-GenericCloud-x86_64-9-20241209.0.x86_64.qcow2
+image_url: https://cloud.centos.org/centos/9-stream/x86_64/images/CentOS-Stream-GenericCloud-x86_64-9-20241209.0.x86_64.qcow2
+image_sha256: 4f02929cfe96b7759c5f6387789968a1a9b5f70f9215085e89111a520662d468
+image_cleanup: no
+
 vm_name: CentOS-Stream-9
 vm_vcpus: 2
 vm_ram_mb: 2048
 vm_net: default
-vm_root_pass: password
-cleanup_image: no
-ssh_pub_key: id_rsa.pub
-ssh_dir: ~/.ssh
+vm_root_password: password
+vm_disk_dir: /var/lib/libvirt/images
