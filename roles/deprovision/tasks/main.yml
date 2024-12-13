@@ -1,0 +1,15 @@
+#SPDX-License-Identifier: MIT-0
+---
+- name: Shutdown VM
+  community.libvirt.virt:
+    name: "{{ vm_name }}"
+    state: shutdown
+- name: Undefine VM
+  community.libvirt.virt:
+    name: "{{ vm_name }}"
+    command: undefine
+    force: true
+- name: Remove Disk
+  file:
+    path: "/var/lib/libvirt/images/{{ vm_name }}.qcow2"
+    state: absent

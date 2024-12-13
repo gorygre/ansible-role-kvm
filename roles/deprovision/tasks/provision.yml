@@ -1,0 +1,72 @@
+- name: Verify dependencies
+  package:
+    name:
+      - libguestfs-tools
+      - libguestfs-tools-c
+      - python3-libvirt
+    state: present
+  become: yes
+
+- name: List machines
+  community.libvirt.virt:
+    command: list_vms
+  register: existing_vms
+  changed_when: no
+
+- name: Ensure VM exists
+  when: "vm.name not in existing_vms.list_vms"
+  block:
+  - name: Download cloud image
+    get_url:
+      url: "{{ image.url }}"
+      dest: "/tmp/{{ image.name }}"
+      checksum: "sha256:{{ image.sha256 }}"
+
+  - name: Copy cloud image to libvirt directory
+    copy:
+      dest: "{{ vm.disk_dir }}/{{ vm.name }}.qcow2"
+      src: "/tmp/{{ image.name }}"
+      force: no
+      remote_src: yes 
+      mode: 0660
+    register: copy_results
+
+  - name: Copy public ssh key
+    copy:
+      dest: "/tmp/"
+      src: "{{ ssh.dir }}/{{ ssh.public_key }}"
+      force: yes
+
+  - name: Configure the image
+    command: |
+      virt-customize -a {{ vm.disk_dir }}/{{ vm.name }}.qcow2 \
+      --hostname {{ vm.name }} \
+      --root-password password:{{ vm.root_password }} \
+      --ssh-inject 'root:file:/tmp/{{ ssh.public_key }}' \
+      --uninstall cloud-init --selinux-relabel
+    when: copy_results is changed
+
+  - name: Define vm
+    community.libvirt.virt:
+      command: define
+      xml: "{{ lookup('template', 'vm-template.xml.j2') }}"
+
+  - name: Remove base image file
+    file:
+      path: "/tmp/{{ image.name }}"
+      state: absent
+    when: image.cleanup | bool
+
+  - name: Remove temporary public ssh key
+    file:
+      path: "/tmp/{{ ssh.public_key }}"
+      state: absent
+
+- name: Ensure VM is started
+  community.libvirt.virt:
+    name: "{{ vm.name }}"
+    state: running
+  register: vm_started
+  until: "vm_started is success"
+  retries: 15
+  delay: 2
